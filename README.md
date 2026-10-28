@@ -2,7 +2,7 @@
 
 Search, alert and report on findings from [Hexward Labs](https://hexwardlabs.com)
 tools — RuleHawk, Loglight, CertLight, Decoy, DmarcWatch, Patchlight,
-TenantWatch, Attack Surface Monitor — in Splunk.
+TenantWatch, Attack Surface Monitor, AuditLight, TopoLight — in Splunk.
 
 The products send the [Hexward Finding Schema](https://github.com/nizartuanku/hexward-core/blob/main/SCHEMA.md)
 (`hexward.finding/1`) with sourcetype `hexward:finding`. This add-on parses
