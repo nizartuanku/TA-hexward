@@ -1,0 +1,5 @@
+# Share field extractions, aliases, event types and tags with every app so
+# CIM data models and Enterprise Security see Hexward findings.
+[]
+access = read : [ * ], write : [ admin ]
+export = system

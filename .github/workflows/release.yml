@@ -1,0 +1,35 @@
+# Packages the add-on as TA-hexward-<version>.tgz (installable with
+# "Install app from file") and publishes it with SHA256SUMS.
+# Trigger: git tag v0.1.0 && git push origin v0.1.0
+name: release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Version in app.conf matches the tag
+        run: |
+          v="${GITHUB_REF_NAME#v}"
+          grep -q "^version = $v$" default/app.conf || { echo "app.conf version is not $v"; exit 1; }
+      - name: Package
+        run: |
+          v="${GITHUB_REF_NAME#v}"
+          mkdir -p pkg/TA-hexward
+          cp -r default metadata README.md LICENSE.txt pkg/TA-hexward/
+          tar -C pkg -czf "TA-hexward-$v.tgz" TA-hexward
+          sha256sum "TA-hexward-$v.tgz" > SHA256SUMS
+      - name: Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          v="${GITHUB_REF_NAME#v}"
+          awk "/^## v$v/{f=1;next} /^## /{f=0} f" CHANGELOG.md > notes.md
+          gh release create "$GITHUB_REF_NAME" "TA-hexward-$v.tgz" SHA256SUMS --title "TA-hexward $v" --notes-file notes.md --latest

@@ -1,0 +1,61 @@
+<form version="1.1" theme="dark">
+  <label>Hexward findings</label>
+  <description>Findings from Hexward Labs tools (Hexward Finding Schema v1).</description>
+  <fieldset submitButton="false">
+    <input type="time" token="t">
+      <label>Time</label>
+      <default>
+        <earliest>-7d@d</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>Open findings</title>
+      <single>
+        <search>
+          <query>eventtype=hexward_finding | stats latest(event) AS e BY id | where e!="resolved" | stats count</query>
+          <earliest>$t.earliest$</earliest>
+          <latest>$t.latest$</latest>
+        </search>
+      </single>
+    </panel>
+    <panel>
+      <title>Opened by severity</title>
+      <chart>
+        <search>
+          <query>eventtype=hexward_finding_opened | stats count BY severity | eval order=case(severity="critical",1,severity="high",2,severity="medium",3,severity="low",4,true(),5) | sort order | fields - order</query>
+          <earliest>$t.earliest$</earliest>
+          <latest>$t.latest$</latest>
+        </search>
+        <option name="charting.chart">bar</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Opened vs resolved</title>
+      <chart>
+        <search>
+          <query>eventtype=hexward_finding (event="opened" OR event="resolved") | timechart count BY event</query>
+          <earliest>$t.earliest$</earliest>
+          <latest>$t.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Latest findings</title>
+      <table>
+        <search>
+          <query>eventtype=hexward_finding_opened | table _time product severity signature dest description | head 50</query>
+          <earliest>$t.earliest$</earliest>
+          <latest>$t.latest$</latest>
+        </search>
+      </table>
+    </panel>
+  </row>
+</form>
